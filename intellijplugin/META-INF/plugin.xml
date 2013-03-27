@@ -1,5 +1,5 @@
 <idea-plugin version="2">
-  <id>com.peterphi.scaf.jpathymeleaf.testing.pluginid</id>
+  <id>com.peterphi.scaf.jpathymeleaf.plugin.pluginid</id>
   <name>Thymeleaf Bootstrap Entity Template Code Generator</name>
   <version>1.0</version>
   <vendor url="http://www.peterphi.com">Peter Wright</vendor>
@@ -29,7 +29,7 @@
 
   <actions>
     <!-- Add your actions here -->
-	  <action id="generateThymeleafEntityTemplate" class="com.peterphi.scaf.jpathymeleaf.testing.GenerateThymeleafEntityTemplate"
+	  <action id="generateThymeleafEntityTemplate" class="com.peterphi.scaf.jpathymeleaf.plugin.GenerateThymeleafEntityTemplate"
 	          text="Thymeleaf Entity Template" description="Generates a Thymeleaf page from a Hibernate Entity">
 		  <add-to-group group-id="GenerateGroup" anchor="last"/>
 	  </action>

@@ -14,20 +14,24 @@ public class FreemarkerCall
 	private final Map<String, Object> data = new HashMap<String, Object>();
 	private final Template template;
 
+
 	public FreemarkerCall(final Template template)
 	{
 		this.template = template;
 	}
+
 
 	public Map<String, Object> getData()
 	{
 		return data;
 	}
 
+
 	public String getName()
 	{
 		return template.getName();
 	}
+
 
 	/**
 	 * Sets a variable which is then exposed to the view layer
@@ -44,12 +48,14 @@ public class FreemarkerCall
 		return this;
 	}
 
+
 	public FreemarkerCall setAll(final Map<String, Object> data)
 	{
 		this.data.putAll(data);
 
 		return this;
 	}
+
 
 	/**
 	 * Render the template to a String
@@ -64,6 +70,7 @@ public class FreemarkerCall
 
 		return sw.toString();
 	}
+
 
 	/**
 	 * Render the template to a Writer
@@ -83,5 +90,4 @@ public class FreemarkerCall
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
-
 }

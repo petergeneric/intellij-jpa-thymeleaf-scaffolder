@@ -1,4 +1,4 @@
-package com.peterphi.scaf.jpathymeleaf.plugin.thymeleaf.formgen;
+package com.peterphi.scaf.jpathymeleaf.util;
 
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
@@ -9,11 +9,13 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiPrimitiveType;
 import com.intellij.psi.PsiType;
-import com.peterphi.scaf.jpathymeleaf.testing.AnnotationConstant;
 
 import java.beans.Introspector;
 import java.util.Collection;
 
+/**
+ * Convenient abstraction over a Class, Field or Method to detect its type, what annotations are present, etc.
+ */
 public class MemberReflection
 {
 	private final PsiModifierListOwner el;
@@ -24,20 +26,24 @@ public class MemberReflection
 	private final PsiField field;
 	private final PsiClass clazz;
 
+
 	public MemberReflection(PsiClass clazz)
 	{
 		this(clazz, JavaPsiFacade.getInstance(clazz.getProject()).getElementFactory().createType(clazz), null, null, clazz);
 	}
+
 
 	public MemberReflection(PsiMethod method)
 	{
 		this(method, method.getReturnType(), method, null, null);
 	}
 
+
 	public MemberReflection(PsiField field)
 	{
 		this(field, field.getType(), null, field, null);
 	}
+
 
 	private MemberReflection(PsiModifierListOwner el,
 	                         PsiType type,
@@ -69,6 +75,7 @@ public class MemberReflection
 			throw new IllegalArgumentException("Don't know how to find type name for " + type);
 	}
 
+
 	/**
 	 * Returns true if this member is generated (i.e. should not be set)
 	 *
@@ -76,8 +83,9 @@ public class MemberReflection
 	 */
 	public boolean isGenerated()
 	{
-		return AnnotationConstant.GENERATED_VALUE.has(el);
+		return JPAAnnotation.GENERATED_VALUE.has(el);
 	}
+
 
 	public String getName()
 	{
@@ -103,30 +111,34 @@ public class MemberReflection
 		}
 	}
 
+
 	public boolean isPersistent()
 	{
 		return hasOne(el,
-		              AnnotationConstant.COLUMN,
-		              AnnotationConstant.JOIN_COLUMN,
-		              AnnotationConstant.ID,
-		              AnnotationConstant.VERSION,
-		              AnnotationConstant.ENTITY);
+		              JPAAnnotation.COLUMN,
+		              JPAAnnotation.JOIN_COLUMN,
+		              JPAAnnotation.ID,
+		              JPAAnnotation.VERSION,
+		              JPAAnnotation.ENTITY);
 	}
+
 
 	public boolean isId()
 	{
-		return AnnotationConstant.ID.has(el);
+		return JPAAnnotation.ID.has(el);
 	}
+
 
 	public boolean isVersion()
 	{
-		return AnnotationConstant.VERSION.has(el);
+		return JPAAnnotation.VERSION.has(el);
 	}
+
 
 	public boolean isNullable()
 	{
-		final String colNullable = AnnotationConstant.COLUMN.read(el, "nullable");
-		final String jcolNullable = AnnotationConstant.JOIN_COLUMN.read(el, "nullable");
+		final String colNullable = JPAAnnotation.COLUMN.read(el, "nullable");
+		final String jcolNullable = JPAAnnotation.JOIN_COLUMN.read(el, "nullable");
 
 		if (colNullable != null)
 			return Boolean.parseBoolean(colNullable); // prefer @Column.nullable
@@ -136,6 +148,7 @@ public class MemberReflection
 			return false; // by default not nullable
 	}
 
+
 	public boolean isCollection()
 	{
 		// Get java.util.Collection
@@ -144,10 +157,12 @@ public class MemberReflection
 		return (type instanceof PsiArrayType) || type.isAssignableFrom(collectionType);
 	}
 
+
 	private PsiType getType(String fqname)
 	{
 		return JavaPsiFacade.getInstance(el.getProject()).getElementFactory().createTypeByFQClassName(fqname);
 	}
+
 
 	public boolean isEnum()
 	{
@@ -156,15 +171,18 @@ public class MemberReflection
 		return enumType.isAssignableFrom(type);
 	}
 
+
 	public boolean isBoolean()
 	{
 		return PsiType.BOOLEAN.isAssignableFrom(type);
 	}
 
+
 	public boolean isNumber()
 	{
 		return PsiType.LONG.isAssignableFrom(type) || PsiType.INT.isAssignableFrom(type) || PsiType.SHORT.isAssignableFrom(type);
 	}
+
 
 	public boolean isString()
 	{
@@ -172,6 +190,7 @@ public class MemberReflection
 
 		return type.isAssignableFrom(stringType);
 	}
+
 
 	public boolean isSimpleColumn()
 	{
@@ -189,19 +208,22 @@ public class MemberReflection
 		return total;
 	}
 
-	private static boolean hasOne(PsiModifierListOwner element, AnnotationConstant... constants)
+
+	private static boolean hasOne(PsiModifierListOwner element, JPAAnnotation... constants)
 	{
-		for (AnnotationConstant constant : constants)
+		for (JPAAnnotation constant : constants)
 			if (constant.has(element))
 				return true;
 
 		return false;
 	}
 
+
 	public PsiField[] getFields()
 	{
 		return ((PsiClassType) type).resolve().getAllFields();
 	}
+
 
 	public PsiMethod[] getMethods()
 	{

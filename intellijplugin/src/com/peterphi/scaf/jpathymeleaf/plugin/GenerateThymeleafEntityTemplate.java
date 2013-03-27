@@ -1,4 +1,4 @@
-package com.peterphi.scaf.jpathymeleaf.testing;
+package com.peterphi.scaf.jpathymeleaf.plugin;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,8 +14,12 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.peterphi.scaf.jpathymeleaf.plugin.thymeleaf.formgen.ThymeleafCodeGenerator;
+import com.peterphi.scaf.jpathymeleaf.codegen.ThymeleafCodeGenerator;
+import com.peterphi.scaf.jpathymeleaf.util.JPAAnnotation;
 
+/**
+ * Action to generate a Thymeleaf Template .html for a given javax.persistence.Entity
+ */
 public class GenerateThymeleafEntityTemplate extends AnAction
 {
 	public void actionPerformed(AnActionEvent e)
@@ -24,6 +28,7 @@ public class GenerateThymeleafEntityTemplate extends AnAction
 
 		generate(psiClass);
 	}
+
 
 	public void generate(final PsiClass clazz)
 	{
@@ -35,7 +40,7 @@ public class GenerateThymeleafEntityTemplate extends AnAction
 			{
 				final PsiDocumentManager manager = PsiDocumentManager.getInstance(clazz.getProject());
 
-				final String entityName = AnnotationConstant.ENTITY.read(clazz, "name");
+				final String entityName = JPAAnnotation.ENTITY.read(clazz, "name");
 
 				// Generate a new Document
 				final PsiDirectory directory = clazz.getContainingFile().getContainingDirectory();
@@ -49,8 +54,8 @@ public class GenerateThymeleafEntityTemplate extends AnAction
 				manager.commitDocument(document);
 			}
 		}.execute();
-
 	}
+
 
 	@Override
 	public void update(final AnActionEvent e)
@@ -64,10 +69,11 @@ public class GenerateThymeleafEntityTemplate extends AnAction
 			return;
 		}
 
-		PsiAnnotation annotation = AnnotationConstant.ENTITY.find(clazz);
+		PsiAnnotation annotation = JPAAnnotation.ENTITY.find(clazz);
 
 		e.getPresentation().setEnabled(annotation != null);
 	}
+
 
 	private PsiClass getPsiClassFromContext(final AnActionEvent e)
 	{

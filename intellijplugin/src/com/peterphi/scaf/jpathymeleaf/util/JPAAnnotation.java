@@ -1,11 +1,14 @@
-package com.peterphi.scaf.jpathymeleaf.testing;
+package com.peterphi.scaf.jpathymeleaf.util;
 
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiModifierListOwner;
 
-public enum AnnotationConstant
+/**
+ * The JPA annotations we reference
+ */
+public enum JPAAnnotation
 {
 	ENTITY("javax.persistence.Entity"),
 	COLUMN("javax.persistence.Column"),
@@ -16,19 +19,24 @@ public enum AnnotationConstant
 
 	private final String className;
 
-	AnnotationConstant(final String className)
+
+	JPAAnnotation(final String className)
 	{
 		this.className = className;
 	}
+
+
 	public boolean has(PsiModifierListOwner element)
 	{
 		return find(element) != null;
 	}
 
+
 	public PsiAnnotation find(PsiModifierListOwner element)
 	{
 		return element.getModifierList().findAnnotation(className);
 	}
+
 
 	/**
 	 * Read an annotation attribute from an annotated element, returning the value as a literal
@@ -48,14 +56,13 @@ public enum AnnotationConstant
 			return null; // could not extract
 	}
 
+
 	public PsiAnnotationMemberValue readMemberValue(PsiModifierListOwner element, String attribute)
 	{
 		PsiAnnotation annotation = find(element);
 
 		if (annotation != null)
-		{
 			return annotation.findAttributeValue(attribute);
-		}
 		else
 			return null;
 	}

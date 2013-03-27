@@ -15,10 +15,12 @@ public class FreemarkerTemplater
 	private final String templatePrefix;
 	private final String templateSuffix;
 
+
 	public FreemarkerTemplater(Configuration config)
 	{
 		this(config, "", ".ftl");
 	}
+
 
 	public FreemarkerTemplater(Configuration config, final String templatePrefix, final String templateSuffix)
 	{
@@ -51,10 +53,12 @@ public class FreemarkerTemplater
 		return call;
 	}
 
+
 	public void set(String key, Object value)
 	{
 		data.put(key, value);
 	}
+
 
 	public void setAll(Map<String, Object> data)
 	{
