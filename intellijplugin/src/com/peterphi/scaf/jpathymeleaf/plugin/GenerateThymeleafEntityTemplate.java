@@ -24,38 +24,78 @@ public class GenerateThymeleafEntityTemplate extends AnAction
 {
 	public void actionPerformed(AnActionEvent e)
 	{
-		final PsiClass psiClass = getPsiClassFromContext(e);
+		final PsiClass clazz = getPsiClassFromContext(e);
 
-		generate(psiClass);
-	}
-
-
-	public void generate(final PsiClass clazz)
-	{
-		// Generate the code we'll put into the file
-		final String text = new ThymeleafCodeGenerator().generate(clazz);
-
-		// Now write it to the file
+		// Perform the generate action
 		new WriteCommandAction.Simple(clazz.getProject())
 		{
 			@Override
 			protected void run() throws Throwable
 			{
-				final PsiDocumentManager manager = PsiDocumentManager.getInstance(clazz.getProject());
-
-				final String entityName = JPAAnnotation.ENTITY.read(clazz, "name");
-
-				// Generate a new Document
-				final PsiDirectory directory = clazz.getContainingFile().getContainingDirectory();
-				final PsiFile file = directory.createFile(entityName + "_template.html");
-
-				final Document document = manager.getDocument(file);
-
-				document.setText(text);
-
-				manager.commitDocument(document);
+				generate(clazz);
 			}
 		}.execute();
+	}
+
+
+	/**
+	 * Generate a .html file based on the entity. Should be called inside a write command.
+	 *
+	 * @param clazz
+	 */
+	public void generate(final PsiClass clazz)
+	{
+		// Generate the code we'll put into the file
+		final String text = new ThymeleafCodeGenerator().generate(clazz);
+
+		final PsiDirectory directory = clazz.getContainingFile().getContainingDirectory();
+		final String fileName = getEntityName(clazz) + "_template.html";
+
+		final PsiFile file = getOrCreate(directory, fileName);
+
+		setText(file, text);
+	}
+
+
+	/**
+	 * Write some text to a PsiFile
+	 *
+	 * @param file
+	 * @param text
+	 */
+	protected void setText(PsiFile file, String text)
+	{
+		final PsiDocumentManager manager = PsiDocumentManager.getInstance(file.getProject());
+
+		final Document document = manager.getDocument(file);
+
+		document.setText(text);
+	}
+
+
+	protected String getEntityName(PsiClass clazz)
+	{
+		return JPAAnnotation.ENTITY.read(clazz, "name");
+	}
+
+
+	/**
+	 * Get or create a file under a directory
+	 *
+	 * @param directory
+	 * @param fileName
+	 *
+	 * @return
+	 */
+	protected PsiFile getOrCreate(PsiDirectory directory, final String fileName)
+	{
+		final PsiFile file = directory.findFile(fileName);
+
+		// Create the file if necessary
+		if (file != null)
+			return file; // the file already existed
+		else
+			return directory.createFile(fileName); // the file didn't exist, create it
 	}
 
 
