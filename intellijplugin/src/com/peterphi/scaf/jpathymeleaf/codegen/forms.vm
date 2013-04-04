@@ -57,7 +57,7 @@
 
 	#end
 
-## Insert an apppropriate HTML field
+## Insert an HTML Input version of a field
 	#macro(htmlField $field)
 		<!-- ${field.name} -->
 		<div class="control-group">
@@ -82,61 +82,66 @@
 		</div>
 	#end
 
-	<h2>Render ${entity.name} as Definition List</h2>
+## Insert an HTML version of a field
+	#macro(htmlText $elname $field)
+		<${elname} th:text="${dollar}{entity.${field.name}}">${field.name}</${elname}>
+	#end
 
-	<dl class="dl-horizontal" th:fragment="render_dd">
+<h2>Render ${entity.name} as Definition List</h2>
+
+<dl class="dl-horizontal" th:fragment="render_dd">
+	#foreach ($field in $entity.fields)
+		#if (!$field.collection)
+			<dt>${field.name}</dt>
+			#htmlText("dd", $field)
+		#else
+			<!-- Ignored collection field ${field.name} -->
+		#end
+	#end
+</dl>
+
+<h2>Render ${entity.name} as Editable Form</h2>
+
+<form class="form-horizontal" method="POST" th:fragment="render_form">
+	#foreach ($field in $entity.fields)
+		#if(!$field.collection)
+			#htmlField($field)
+		#else
+			<!-- Ignored collection field ${field.name} -->
+		#end
+	#end
+	<div class="control-group">
+		<div class="controls">
+			<button type="submit" class="btn btn-primary">Submit</button>
+			<button type="reset" class="btn">Reset</button>
+		</div>
+	</div>
+</form>
+
+
+<h2>Render List of ${entity.name} as Table</h2>
+
+
+<table class="table table-striped" th:fragment="render_list_table">
+	<thead>
+	<tr>
 		#foreach ($field in $entity.fields)
 			#if (!$field.collection)
-				<dt>${field.name}</dt>
-				<dd th:text="${dollar}{entity.${field.name}}">${field.name} value</dd>
-			#else
-				<!-- Ignored collection field ${field.name} -->
+				<th>${field.name}</th>
 			#end
 		#end
-	</dl>
-
-	<h2>Render ${entity.name} as Editable Form</h2>
-
-	<form class="form-horizontal" method="POST" th:fragment="render_form">
+	</tr>
+	</thead>
+	<tbody>
+	<tr th:each="entity: ${dollar}{entities}">
 		#foreach ($field in $entity.fields)
-			#if(!$field.collection)
-				#htmlField($field)
-			#else
-				<!-- Ignored collection field ${field.name} -->
-			#end
+		#if (!$field.collection)
+			#htmlText("td", $field)
 		#end
-		<div class="control-group">
-			<div class="controls">
-				<button type="submit" class="btn btn-primary">Submit</button>
-				<button type="reset" class="btn">Reset</button>
-			</div>
-		</div>
-	</form>
-
-
-	<h2>Render List of ${entity.name} as Table</h2>
-
-
-	<table class="table table-striped" th:fragment="render_list_table">
-		<thead>
-		<tr>
-			#foreach ($field in $entity.fields)
-				#if (!$field.collection)
-					<th>${field.name}</th>
-				#end
-			#end
-		</tr>
-		</thead>
-		<tbody>
-		<tr th:each="entity: ${dollar}{entities}">
-			#foreach ($field in $entity.fields)
-				#if (!$field.collection)
-					<td th:text="${dollar}{entity.${field.name}}">${field.name}</td>
-				#end
-			#end
-		</tr>
-		</tbody>
-	</table>
+		#end
+	</tr>
+	</tbody>
+</table>
 </div>
 </body>
 </html>
