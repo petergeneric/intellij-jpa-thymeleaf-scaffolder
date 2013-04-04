@@ -1,0 +1,142 @@
+#* @vtlvariable name="entity" type="com.peterphi.scaf.jpathymeleaf.codegen.PersistentMember" *###
+#* @vtlvariable name="field" type="com.peterphi.scaf.jpathymeleaf.codegen.PersistentMember" *###
+#set($dollar='$')##
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>${entity.name} Includes</title>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+	<link href="bootstrap.min.css" rel="stylesheet" media="screen"/>
+</head>
+
+<body id="top">
+<div class="container">
+
+## Insert a textbox for a String
+	#macro (stringField $formId $field)
+		<input
+				type="text"
+				id="${formId}"
+				name="${field.name}"
+				placeholder=""
+				th:value="${dollar}{entity.${field.name}}"/>
+	#end
+
+## Insert a textbox for a number
+	#macro (numberField $formId $field)
+		<input
+				type="number"
+				id="input_${field.name}"
+				name="${field.name}"
+				placeholder=""
+				th:value="${dollar}{entity.${field.name}}"/>
+	#end
+
+## Insert a checkbox for a boolean
+	#macro (booleanField $formId $field)
+		<input
+				id="${formId}"
+				name="${field.name}"
+				type="checkbox"
+				th:checked="${dollar}{entity.${field.name}}"/>
+	#end
+
+## Insert a dropdown for an enum
+	#macro (enumField $formId $field)
+		<select id="${formId}" name="${field.name}">
+		## iterate over enum values as enumVal
+			<option
+					th:each="enumVal: ${dollar}{@${field.typeName}@values()}"
+					th:selected="${dollar}{entity.${field.name}} == ${dollar}{enumVal}"
+					th:value="${dollar}{enumVal.name()}"
+					th:text="${dollar}{enumVal.toString()}">
+				enumVal
+			</option>
+		</select>
+
+	#end
+
+## Insert an apppropriate HTML field
+	#macro(htmlField $field)
+		<!-- ${field.name} -->
+		<div class="control-group">
+			<label class="control-label" for="input_${field.name}">${field.name}</label>
+
+			<div class="controls">
+				#if ($field.string)
+					#stringField ("input_${field.name}" $field)
+				#elseif($field.number)
+					#numberField ("input_${field.name}" $field)
+				#elseif($field.boolean)
+					#booleanField ("input_${field.name}" $field)
+				#elseif($field.enum)
+					#enumField ("input_${field.name}" $field)
+				#else
+					#stringField ("input_${field.name}" $field)
+				#end
+
+				<!-- Help / Warning text -->
+				<span class="help-inline"></span>
+			</div>
+		</div>
+	#end
+
+	<h2>Render ${entity.name} as Definition List</h2>
+
+	<dl class="dl-horizontal" th:fragment="render_dd">
+		#foreach ($field in $entity.fields)
+			#if (!$field.collection)
+				<dt>${field.name}</dt>
+				<dd th:text="${dollar}{entity.${field.name}}">${field.name} value</dd>
+			#else
+				<!-- Ignored collection field ${field.name} -->
+			#end
+		#end
+	</dl>
+
+	<h2>Render ${entity.name} as Editable Form</h2>
+
+	<form class="form-horizontal" method="POST" th:fragment="render_form">
+		#foreach ($field in $entity.fields)
+			#if(!$field.collection)
+				#htmlField($field)
+			#else
+				<!-- Ignored collection field ${field.name} -->
+			#end
+		#end
+		<div class="control-group">
+			<div class="controls">
+				<button type="submit" class="btn btn-primary">Submit</button>
+				<button type="reset" class="btn">Reset</button>
+			</div>
+		</div>
+	</form>
+
+
+	<h2>Render List of ${entity.name} as Table</h2>
+
+
+	<table class="table table-striped" th:fragment="render_list_table">
+		<thead>
+		<tr>
+			#foreach ($field in $entity.fields)
+				#if (!$field.collection)
+					<th>${field.name}</th>
+				#end
+			#end
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="entity: ${dollar}{entities}">
+			#foreach ($field in $entity.fields)
+				#if (!$field.collection)
+					<td th:text="${dollar}{entity.${field.name}}">${field.name}</td>
+				#end
+			#end
+		</tr>
+		</tbody>
+	</table>
+</div>
+</body>
+</html>

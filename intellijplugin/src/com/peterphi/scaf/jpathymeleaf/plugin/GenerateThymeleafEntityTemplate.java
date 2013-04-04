@@ -32,7 +32,10 @@ public class GenerateThymeleafEntityTemplate extends AnAction
 
 	public void generate(final PsiClass clazz)
 	{
+		// Generate the code we'll put into the file
+		final String text = new ThymeleafCodeGenerator().generate(clazz);
 
+		// Now write it to the file
 		new WriteCommandAction.Simple(clazz.getProject())
 		{
 			@Override
@@ -45,9 +48,8 @@ public class GenerateThymeleafEntityTemplate extends AnAction
 				// Generate a new Document
 				final PsiDirectory directory = clazz.getContainingFile().getContainingDirectory();
 				final PsiFile file = directory.createFile(entityName + "_template.html");
-				final Document document = manager.getDocument(file);
 
-				final String text = new ThymeleafCodeGenerator().generate(clazz);
+				final Document document = manager.getDocument(file);
 
 				document.setText(text);
 

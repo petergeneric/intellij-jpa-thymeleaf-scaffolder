@@ -1,30 +1,24 @@
 package com.peterphi.scaf.jpathymeleaf.codegen;
 
 import com.intellij.psi.PsiClass;
-import com.peterphi.scaf.jpathymeleaf.freemarker.FreemarkerCall;
-import com.peterphi.scaf.jpathymeleaf.freemarker.FreemarkerTemplater;
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
+import com.peterphi.scaf.jpathymeleaf.velocity.VelocityCall;
+import com.peterphi.scaf.jpathymeleaf.velocity.VelocityTemplater;
 
 public class ThymeleafCodeGenerator
 {
-	private final FreemarkerTemplater templater;
+	private final VelocityTemplater templater;
 
 
 	public ThymeleafCodeGenerator()
 	{
-		// Set up a Freemarker instance that loads from this .jar
-		Configuration config = new Configuration();
-		config.setClassForTemplateLoading(getClass(), "/com/peterphi/scaf/jpathymeleaf/codegen");
-		config.setObjectWrapper(new DefaultObjectWrapper());
-
-		this.templater = new FreemarkerTemplater(config);
+		// Set up a Velocity instance that loads from this .jar
+		this.templater = new VelocityTemplater();
 	}
 
 
 	public String generate(PsiClass entity)
 	{
-		FreemarkerCall call = templater.template("forms");
+		VelocityCall call = templater.template("/com/peterphi/scaf/jpathymeleaf/codegen/forms.vm");
 
 		call.set("entity", new PersistentMember(entity));
 
